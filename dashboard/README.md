@@ -58,6 +58,7 @@ See `src/api/endpoints.js` for the endpoint constants used by the frontend.
 2. Commit changes and push to GitHub.
 3. Open a Pull Request against `main` and request review.
 
+
 ## Deploy
 
 - Recommended: Render, Vercel, or Railway.
@@ -67,6 +68,8 @@ See `src/api/endpoints.js` for the endpoint constants used by the frontend.
 - Full-stack (frontend + API on Vercel): this repo now includes a Vercel serverless API under `api/[...slug].js`, so frontend and API can run together on Vercel using the same `/api/*` routes.
 
 - Example for Render: set build command to `npm run build` and start command to `node server/index.js`.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for a detailed guide: required secrets, Render/Vercel steps, CI workflow behavior, and troubleshooting.
 
 Detailed deployment notes
 

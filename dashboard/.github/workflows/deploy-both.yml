@@ -31,7 +31,13 @@ jobs:
         env:
           VITE_API_BASE: ${{ secrets.FRONTEND_VITE_API_BASE }}
 
-      - name: Trigger Render deploy (API)
+      - name: Trigger Render deploy (via Deploy Hook)
+        if: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "Triggering Render deploy via Deploy Hook"
+          curl -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+      - name: Trigger Render deploy (via API)
         if: ${{ secrets.RENDER_API_KEY && secrets.RENDER_SERVICE_ID }}
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
@@ -45,16 +51,12 @@ jobs:
             -d '{"clearCache":true}' \
             "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys"
 
-      - name: Deploy frontend to Vercel
+      - name: Deploy frontend to Vercel (action)
         if: ${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          npm i -g vercel
-          # `vercel --prod` requires the project to be linked in Vercel or provided via VERCEL_PROJECT_ID.
-          if [ -n "$VERCEL_PROJECT_ID" ]; then
-            npx vercel --prod --token "$VERCEL_TOKEN" --confirm --project "$VERCEL_PROJECT_ID"
-          else
-            npx vercel --prod --token "$VERCEL_TOKEN" --confirm
-          fi
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: dashboard
+          prod: true
