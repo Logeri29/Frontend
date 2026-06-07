@@ -1,7 +1,7 @@
 import { MapPin } from 'lucide-react';
 
 const areas = [
-  { rank: 1, name: 'Kafanchan', reports: 20, max: 20 },
+  { rank: 1, name: 'Surulere', reports: 20, max: 20 },
   { rank: 2, name: 'Ojo', reports: 15, max: 20 },
   { rank: 3, name: 'GRA', reports: 10, max: 20 },
 ];
