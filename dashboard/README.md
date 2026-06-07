@@ -20,7 +20,15 @@ npm run dev                    # frontend (Vite)
 npm --prefix server run dev    # API (nodemon)
 ```
 
-3. Build and serve (production-style)
+3. Share the local frontend with others
+
+```bash
+npx ngrok http 5173
+# or
+npx localtunnel --port 5173
+```
+
+4. Build and serve (production-style)
 
 ```bash
 npm run build
