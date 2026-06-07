@@ -55,29 +55,33 @@ function formatTime(minutes) {
 }
 
 export default function AlertsModal({ onClose, alerts = [] }) {
-  const [allAlerts, setAllAlerts] = useState(alerts);
-  const [loading, setLoading] = useState(!alerts.length);
+  const [fetchedAlerts, setFetchedAlerts] = useState([]);
+  const [requestFinished, setRequestFinished] = useState(!!alerts.length);
+  const allAlerts = alerts.length ? alerts : fetchedAlerts;
+  const loading = !requestFinished && !allAlerts.length;
 
   useEffect(() => {
+    if (alerts.length) {
+      return;
+    }
+
     const fetchAlerts = async () => {
       try {
         const res = await fetch('/api/incidents/incidents/');
         if (res.ok) {
           const incidents = await res.json();
-          setAllAlerts(incidents.slice(0, 20).map(mapIncidentToAlert));
+          setFetchedAlerts(incidents.slice(0, 20).map(mapIncidentToAlert));
         }
       } catch (err) {
         console.error('Failed to fetch alerts:', err);
       } finally {
-        setLoading(false);
+        setRequestFinished(true);
       }
     };
 
-    if (!alerts.length) {
-      fetchAlerts();
-      const interval = setInterval(fetchAlerts, 5000);
-      return () => clearInterval(interval);
-    }
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, 5000);
+    return () => clearInterval(interval);
   }, [alerts]);
   return (
     <div className="fixed inset-0 z-50">

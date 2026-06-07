@@ -9,6 +9,14 @@ const mapIncidentToAlert = (incident) => ({
   location: incident.location,
   minutesAgo: Math.floor(Math.random() * 180) + 10,
   severity: incident.severityScore >= 4 ? 'high' : incident.severityScore === 3 ? 'medium' : 'caution',
+  status:
+    incident.status === 'Ongoing'
+      ? 'Active'
+      : incident.status === 'Closed'
+      ? 'In Review'
+      : 'Monitoring',
+  reportCount: incident.reportCount || 1,
+  assignedTo: incident.assignedTo || `Officer ${String.fromCharCode(65 + (incident.id % 26))}`,
 });
 
 export default function ActiveAlerts() {
