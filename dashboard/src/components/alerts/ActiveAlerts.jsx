@@ -7,7 +7,7 @@ const mapIncidentToAlert = (incident) => ({
   title: `${incident.type} Report`,
   description: incident.notes || `${incident.type} incident reported`,
   location: incident.location,
-  minutesAgo: Math.floor(Math.random() * 180) + 10,
+  minutesAgo: Math.floor(Math.random() * 200) + 10,
   severity: incident.severityScore >= 4 ? 'high' : incident.severityScore === 3 ? 'medium' : 'caution',
   status:
     incident.status === 'Ongoing'
