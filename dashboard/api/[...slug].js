@@ -11,16 +11,29 @@ const filterSegments = (segments) => (Array.isArray(segments) ? segments : [segm
 const handleAuth = (req, res, segments) => {
   const route = segments.slice(1).join('/');
 
+  // Mock tokens shaped to match the real Django/SimpleJWT contract:
+  // { tokens: { access, refresh }, user }
+  const mockTokens = () => ({ access: 'fake-access-token', refresh: 'fake-refresh-token' });
+
   if (req.method === 'POST' && route === 'signup') {
-    const { email, password, name } = req.body;
-    if (!email || !password) return badRequest(res, 'Email and password are required.');
-    return res.status(201).json({ user: { id: 1, email, name: name || 'User' }, token: 'fake-jwt-token' });
+    const { username, email, password } = req.body;
+    if (!username || !password) return badRequest(res, 'Username and password are required.');
+    return res.status(201).json({
+      tokens: mockTokens(),
+      user: { id: 1, username, email: email || '', role: 'FIELD_STAFF' },
+      message: 'Account created successfully.',
+    });
   }
 
   if (req.method === 'POST' && route === 'login') {
-    const { email, password } = req.body;
-    if (!email || !password) return badRequest(res, 'Email and password are required.');
-    return res.json({ user: { id: 1, email, name: 'Demo User' }, token: 'fake-jwt-token' });
+    // Accept username (real backend); fall back to email for older clients.
+    const { username, email, password } = req.body;
+    const identifier = username || email;
+    if (!identifier || !password) return badRequest(res, 'Username and password are required.');
+    return res.json({
+      tokens: mockTokens(),
+      user: { id: 1, username: identifier, email: email || '', role: 'Administrator' },
+    });
   }
 
   if (req.method === 'POST' && route === 'logout') {
@@ -32,7 +45,7 @@ const handleAuth = (req, res, segments) => {
   }
 
   if (req.method === 'POST' && route === 'refresh') {
-    return res.json({ token: 'fake-jwt-token' });
+    return res.json({ access: 'fake-access-token' });
   }
 
   if (req.method === 'GET' && route === 'organisations/search') {

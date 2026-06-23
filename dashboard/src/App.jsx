@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { FileText, Users, AlertTriangle, ShieldCheck } from 'lucide-react';
+import LoginPage from './components/LoginPage';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import StatsCard from './components/StatsCard';
@@ -10,7 +11,25 @@ import TopReportedAreas from './components/TopReportedAreas';
 
 const INITIAL_NEW_REPORTS = 12;
 
+const TOKEN_KEY = 'safepulse_access';
+
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => !!localStorage.getItem(TOKEN_KEY)
+  );
+
+  const handleLoginSuccess = useCallback(() => {
+    setIsAuthenticated(true);
+  }, []);
+
+  if (!isAuthenticated) {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  return <Dashboard />;
+}
+
+function Dashboard() {
   const [newReports, setNewReports] = useState(INITIAL_NEW_REPORTS);
   const [activeCases] = useState(6);
   const [escalatedCases] = useState(3);
@@ -31,7 +50,7 @@ export default function App() {
     setSearchQuery(value);
   };
 
-  const handleAcknowledgeFromPanel = (id) => {
+  const handleAcknowledgeFromPanel = () => {
     // Close the panel after acknowledging. Feed handles its own acknowledge state.
     setSelectedIncident(null);
   };
