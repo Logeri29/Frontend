@@ -6,7 +6,16 @@ let nextId = incidents.length ? Math.max(...incidents.map((item) => item.id)) + 
 const notFound = (res, message = 'Not found') => res.status(404).json({ error: message });
 const badRequest = (res, message) => res.status(400).json({ error: message });
 
-const filterSegments = (segments) => (Array.isArray(segments) ? segments : [segments]).filter(Boolean);
+// Derive the path segments after `/api/`. Works whether Vercel populates the
+// catch-all `slug` as an array, a single string, or not at all (fall back to
+// parsing the request URL directly).
+const getSegments = (req) => {
+  const raw = req.query?.slug;
+  if (Array.isArray(raw)) return raw.filter(Boolean);
+  if (typeof raw === 'string' && raw) return raw.split('/').filter(Boolean);
+  const path = (req.url || '').split('?')[0];
+  return path.replace(/^\/api\/?/, '').split('/').filter(Boolean);
+};
 
 const handleAuth = (req, res, segments) => {
   const route = segments.slice(1).join('/');
@@ -120,7 +129,7 @@ const handleIncidents = (req, res, segments) => {
 };
 
 export default function handler(req, res) {
-  const segments = filterSegments(req.query.slug || []);
+  const segments = getSegments(req);
   if (segments.length === 0) {
     return notFound(res, 'API route not found');
   }
@@ -135,7 +144,3 @@ export default function handler(req, res) {
 
   return notFound(res, 'API route not found');
 }
-
-export const config = {
-  runtime: 'nodejs18.x',
-};
